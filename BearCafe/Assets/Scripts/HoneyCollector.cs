@@ -5,12 +5,11 @@ using UnityEngine.UI;
 
 public class HoneyCollector : MonoBehaviour
 {
-    public GameObject honeyPrefab; // Префаб меда
-    public int honeyCount = 5; // Количество меда для появления
+    public GameObject honeyPrefab;
+    public int honeyCount = 5;
 
     void Start()
     {
-        // Убираем мед в начале
         RemoveAllHoney();
     }
 
@@ -35,20 +34,15 @@ public class HoneyCollector : MonoBehaviour
             Instantiate(honeyPrefab, randomPosition, Quaternion.identity).tag = "Honey";
         }
     }
-    
+
     public void CollectHoney(GameObject honey)
     {
-        // Получаем компонент Transform объекта меда
         Transform honeyTransform = honey.transform;
-
-        // Уменьшаем размер меда
         honeyTransform.localScale *= 1.1f;
 
-        // Проверяем, достиг ли размер минимального значения
-        if (honeyTransform.localScale.x < 0.1f) // Минимальный размер (можно настроить)
+        if (honeyTransform.localScale.x < 0.1f)
         {
-            Destroy(honey); // Уничтожаем объект меда
+            Destroy(honey);
         }
     }
-
 }

@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class CameraSwitcher : MonoBehaviour
 {
-    public Camera[] cameras; // Массив камер для переключения
+    public Camera[] cameras;
     private int currentCameraIndex = 0;
-    public MonoBehaviour[] scriptsToDisable; // Ссылка на скрипт, который нужно отключить
-    public GameObject uiElement; // Ссылка на UI-элемент
+    public MonoBehaviour[] scriptsToDisable;
+    public GameObject uiElement;
     
     void Start()
     {
@@ -14,12 +14,12 @@ public class CameraSwitcher : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E)) // Замените 'E' на нужную вам клавишу
+        if (Input.GetKeyDown(KeyCode.E))
         {
             currentCameraIndex++;
             if (currentCameraIndex >= cameras.Length)
             {
-                currentCameraIndex = 0; // Сброс индекса, если он превышает количество камер
+                currentCameraIndex = 0;
             }
             SwitchCamera(currentCameraIndex);
         }
@@ -29,23 +29,20 @@ public class CameraSwitcher : MonoBehaviour
     {
         for (int i = 0; i < cameras.Length; i++)
         {
-            cameras[i].enabled = (i == index); // Включаем только текущую камеру
+            cameras[i].enabled = (i == index);
         }
 
-        // Блокировка или разблокировка скрипта и курсора в зависимости от активной камеры
-        if (index == 0) // Например, первая камера — это игровая камера
+        if (index == 0)
         {
             EnableScripts();
-            LockCursor(); // Заблокировать курсор и скрыть его
-            HideUIElement(); // Скрыть UI-элемент
+            LockCursor();
+            HideUIElement();
         }
-        else // Вторая камера — это камера интерфейса или меню
+        else
         {
             DisableScripts();
-            UnlockCursor(); // Разблокировать курсор и сделать его видимым
-            
-            ShowUIElement(); // Показать UI-элемент
-            
+            UnlockCursor();
+            ShowUIElement();
         }
     }
 
@@ -55,7 +52,7 @@ public class CameraSwitcher : MonoBehaviour
         {
             if (script != null)
             {
-                script.enabled = false; // Отключаем указанные скрипты
+                script.enabled = false;
             }
         }
     }
@@ -66,7 +63,7 @@ public class CameraSwitcher : MonoBehaviour
         {
             if (script != null)
             {
-                script.enabled = true; // Включаем указанные скрипты
+                script.enabled = true;
             }
         }
         
@@ -74,20 +71,21 @@ public class CameraSwitcher : MonoBehaviour
 
     void LockCursor()
     {
-        Cursor.lockState = CursorLockMode.Locked; // Блокируем курсор
-        Cursor.visible = false; // Скрываем курсор
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void UnlockCursor()
     {
-        Cursor.lockState = CursorLockMode.None; // Разблокируем курсор
-        Cursor.visible = true; // Показываем курсор
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
+    
     void HideUIElement()
     {
         if (uiElement != null)
         {
-            uiElement.SetActive(false); // Скрываем UI-элемент
+            uiElement.SetActive(false);
         }
     }
 
@@ -95,7 +93,7 @@ public class CameraSwitcher : MonoBehaviour
     {
         if (uiElement != null)
         {
-            uiElement.SetActive(true); // Показываем UI-элемент
+            uiElement.SetActive(true);
         }
     }
-}   
+}

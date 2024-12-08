@@ -5,17 +5,14 @@ using TMPro;
 
 public class HoneySuckerController : MonoBehaviour
 {
-    public Camera mainCamera; // Ссылка на основную камеру
-    public float fixedYPosition = 0.5f; // Фиксированная позиция по оси Y
-    public int HoneyCount = 0; // Счётчик меда
-    public TextMeshProUGUI honeyCountText; // Ссылка на текстовый элемент для отображения счётчика
+    public Camera mainCamera;
+    public float fixedYPosition = 0.5f;
+    public int HoneyCount = 0;
+    public TextMeshProUGUI honeyCountText;
     public CounterOnObject Reset;
     public string username = "user_3024";
-    
-    // Параметры для создания игрока
     public string gameUuid = "9e85841d-ac10-417c-898f-4910ad24ccca";
-
-    public TextMeshProUGUI statusText; // Для отображения статуса запроса
+    public TextMeshProUGUI statusText;
 
     private void Start()
     {
@@ -29,25 +26,16 @@ public class HoneySuckerController : MonoBehaviour
     {
         if (Cursor.lockState == CursorLockMode.None)
         {
-            Debug.Log("Курсор разблокирован и видим.");
-
-            // Проверяем, нажата ли левая кнопка мыши
-            if (Input.GetMouseButton(0)) // 0 - это левая кнопка мыши
+            if (Input.GetMouseButton(0))
             {
-                // Получаем позицию курсора на экране
                 Vector3 mousePosition = Input.mousePosition;
-
-                // Преобразуем экранные координаты в мировые координаты
                 Ray ray = mainCamera.ScreenPointToRay(mousePosition);
-                Plane plane =
-                    new Plane(Vector3.up, new Vector3(0, fixedYPosition, 0)); // Создаем плоскость на фиксированной высоте
+                Plane plane = new Plane(Vector3.up, new Vector3(0, fixedYPosition, 0));
 
                 float enter;
                 if (plane.Raycast(ray, out enter))
                 {
-                    // Получаем точку пересечения луча и плоскости
                     Vector3 hitPoint = ray.GetPoint(enter);
-                    // Устанавливаем позицию медососа на точку пересечения, фиксируя Y
                     transform.position = new Vector3(hitPoint.x, fixedYPosition, hitPoint.z);
                 }
             }
@@ -57,11 +45,11 @@ public class HoneySuckerController : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Honey")) // Проверяем, является ли объект медом
+        if (other.CompareTag("Honey"))
         {
-            Destroy(other.gameObject); // Уничтожаем объект меда
+            Destroy(other.gameObject);
             HoneyCount++;
-            UpdateHoneyCountText(); // Обновляем текст счётчика меда
+            UpdateHoneyCountText();
             StartCoroutine(UpdatePlayerResources(HoneyCount));
         }
     }
@@ -70,80 +58,54 @@ public class HoneySuckerController : MonoBehaviour
     {
         if (string.IsNullOrEmpty(gameUuid) || string.IsNullOrEmpty(username))
         {
-            Debug.LogError("Game UUID или имя игрока не заданы.");
             yield break;
         }
 
-        // Формируем URL для обновления ресурсов игрока
         string url = $"https://2025.nti-gamedev.ru/api/games/{gameUuid}/players/{username}/";
-
-        // Создаем объект с новыми ресурсами
         PlayerData updatedPlayerData = new PlayerData
         {
             resources = new Resources { honey = honeyAmount }
         };
 
-        // Преобразуем объект в JSON
         string jsonData = JsonUtility.ToJson(updatedPlayerData);
-
-        // Отправляем PUT-запрос с обновленными данными
         UnityWebRequest putRequest = UnityWebRequest.Put(url, jsonData);
-        putRequest.method = UnityWebRequest.kHttpVerbPUT; // Указываем, что это PUT-запрос
+        putRequest.method = UnityWebRequest.kHttpVerbPUT;
 
-        // Устанавливаем заголовок для указания типа контента
         putRequest.SetRequestHeader("Content-Type", "application/json");
 
-        // Ждем ответа от сервера
         yield return putRequest.SendWebRequest();
 
         if (putRequest.result != UnityWebRequest.Result.Success)
         {
-            // Если запрос не удался, выводим ошибку
             Debug.LogError("Ошибка при обновлении ресурсов игрока: " + putRequest.error);
         }
         else
         {
-            // Если запрос успешен, выводим ответ от сервера
-            Debug.Log("Ответ от сервера: " + putRequest.downloadHandler.text);
-
-            // Преобразуем полученный ответ в объект PlayerData
             PlayerData player = JsonUtility.FromJson<PlayerData>(putRequest.downloadHandler.text);
-
-            // Выводим обновленные ресурсы игрока
             Debug.Log($"Игрок {player.name} обновил ресурсы. Количество меда: {player.resources.honey}");
         }
     }
+
     private IEnumerator GetPlayerResources()
     {
         if (string.IsNullOrEmpty(gameUuid) || string.IsNullOrEmpty(username))
         {
-            Debug.LogError("Game UUID или имя игрока не заданы.");
             yield break;
         }
 
-        // Формируем URL для получения ресурсов игрока
         string url = $"https://2025.nti-gamedev.ru/api/games/{gameUuid}/players/{username}/";
-
-        // Отправляем GET-запрос
         UnityWebRequest getRequest = UnityWebRequest.Get(url);
 
-        // Ждем ответа от сервера
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            // Если запрос не удался, выводим ошибку
             Debug.LogError("Ошибка при получении ресурсов игрока: " + getRequest.error);
         }
         else
         {
-            // Если запрос успешен, выводим полученный ответ
-            Debug.Log("Ответ от сервера: " + getRequest.downloadHandler.text);
-
-            // Преобразуем полученный JSON в объект PlayerData
             PlayerData player = JsonUtility.FromJson<PlayerData>(getRequest.downloadHandler.text);
 
-            // Выводим информацию о ресурсах игрока
             if (player.resources != null)
             {
                 Debug.Log($"Игрок: {player.name}, Ресурсы: {player.resources.honey}");
@@ -154,105 +116,87 @@ public class HoneySuckerController : MonoBehaviour
             }
         }
     }
+
     private IEnumerator GetPlayerList()
     {
         if (string.IsNullOrEmpty(gameUuid))
         {
-            Debug.LogError("Game UUID не задан.");
             yield break;
         }
 
-        // URL для получения списка игроков
         string url = $"https://2025.nti-gamedev.ru/api/games/{gameUuid}/players/";
-
-        // Отправляем GET-запрос на сервер
         UnityWebRequest getRequest = UnityWebRequest.Get(url);
 
-        // Ждем ответа от сервера
         yield return getRequest.SendWebRequest();
 
         if (getRequest.result != UnityWebRequest.Result.Success)
         {
-            // Если запрос не удался, выводим ошибку
             Debug.LogError("Ошибка при получении списка игроков: " + getRequest.error);
         }
         else
         {
-            // Если запрос успешен, выводим полученный ответ
-            Debug.Log("Ответ от сервера: " + getRequest.downloadHandler.text);
-
-            // Преобразуем полученный JSON в список игроков
             PlayerData[] players = JsonHelper.FromJson<PlayerData>(getRequest.downloadHandler.text);
 
-            // Выводим информацию о каждом игроке
             foreach (var player in players)
             {
                 Debug.Log($"Игрок: {player.name}, Мёд: {player.resources?.honey ?? 0}");
             }
         }
     }
+
     private void UpdateHoneyCountText()
     {
         if (honeyCountText != null)
         {
-            honeyCountText.text = "Собрано меда: " + HoneyCount.ToString(); // Обновляем отображаемый текст
+            honeyCountText.text = "Собрано меда: " + HoneyCount.ToString();
         }
         else
         {
-            Debug.LogError("honeyCountText не установлен!"); // Сообщение об ошибке, если текст не установлен
+            Debug.LogError("honeyCountText не установлен!");
         }
     }
 
-    // Корутин для создания игрока
     private string GenerateUniquePlayerName()
     {
-        // Генерация уникального имени с использованием случайного числа
         return "user_" + Random.Range(1000, 9999);
     }
-    
+
     private IEnumerator CreatePlayer()
     {
         if (string.IsNullOrEmpty(gameUuid))
         {
-            Debug.LogError("Game UUID не задан.");
             yield break;
         }
 
-        // Генерация уникального имени для нового игрока
         string uniquePlayerName = GenerateUniquePlayerName();
         Debug.Log("Генерированное имя игрока: " + uniquePlayerName);
 
         string url = $"https://2025.nti-gamedev.ru/api/games/{gameUuid}/players/";
 
-        // Создаем JSON-данные для запроса
         PlayerData playerData = new PlayerData
         {
             name = uniquePlayerName,
             resources = new Resources
             {
-                honey = HoneyCount // Устанавливаем количество яблок
+                honey = HoneyCount
             }
         };
 
-        // Логируем тело запроса перед отправкой
         string json = JsonUtility.ToJson(playerData);
-        Debug.Log("Тело запроса: " + json);  // Логирование тела запроса
+        Debug.Log("Тело запроса: " + json);
 
-        // Отправляем POST-запрос
         UnityWebRequest postRequest = new UnityWebRequest(url, "POST");
         byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
         postRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
         postRequest.downloadHandler = new DownloadHandlerBuffer();
         postRequest.SetRequestHeader("Content-Type", "application/json");
 
-        // Ждем ответа от сервера
         yield return postRequest.SendWebRequest();
 
         if (postRequest.result != UnityWebRequest.Result.Success)
         {
-            // Логируем подробную ошибку и ответ сервера
             Debug.LogError("Ошибка при создании игрока: " + postRequest.error);
-            Debug.LogError("Ответ от сервера: " + postRequest.downloadHandler.text); // Логирование ответа от сервера
+            Debug.LogError("Ответ от сервера: " + postRequest.downloadHandler.text);
             if (statusText != null)
             {
                 statusText.text = "Ошибка при создании игрока";
@@ -260,7 +204,6 @@ public class HoneySuckerController : MonoBehaviour
         }
         else
         {
-            // Логируем успешный ответ
             Debug.Log("Игрок успешно создан: " + postRequest.downloadHandler.text);
             if (statusText != null)
             {
@@ -269,9 +212,6 @@ public class HoneySuckerController : MonoBehaviour
         }
     }
 
-
-
-    // Класс для данных игрока
     [System.Serializable]
     public class PlayerData
     {
@@ -279,14 +219,12 @@ public class HoneySuckerController : MonoBehaviour
         public Resources resources;
     }
 
-    // Класс для ресурсов игрока
     [System.Serializable]
     public class Resources
     {
         public int honey;
     }
 
-    // Корутин для удаления всех игроков
     private IEnumerator DeleteAllPlayers()
     {
         UnityWebRequest getRequest = UnityWebRequest.Get($"https://2025.nti-gamedev.ru/api/games/{gameUuid}/players/");
@@ -298,7 +236,6 @@ public class HoneySuckerController : MonoBehaviour
             yield break;
         }
 
-        // Парсим ответ JSON, получаем массив игроков
         Player[] players = JsonHelper.FromJson<Player>(getRequest.downloadHandler.text);
 
         if (players.Length == 0)
@@ -307,7 +244,6 @@ public class HoneySuckerController : MonoBehaviour
             yield break;
         }
 
-        // Удаляем каждого игрока
         foreach (var player in players)
         {
             string playerName = player.name;
@@ -325,21 +261,18 @@ public class HoneySuckerController : MonoBehaviour
             }
         }
 
-        // После удаления всех игроков обновляем статус
         if (honeyCountText != null)
         {
             honeyCountText.text = "Все игроки удалены!";
         }
     }
 
-    // Класс для парсинга одного игрока
     [System.Serializable]
     public class Player
     {
         public string name;
     }
 
-    // Вспомогательный класс для парсинга массива JSON
     public static class JsonHelper
     {
         public static T[] FromJson<T>(string json)

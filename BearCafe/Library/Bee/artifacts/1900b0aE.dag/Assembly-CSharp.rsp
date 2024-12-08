@@ -362,7 +362,6 @@
 "Assets/Scripts/CounterOnObject.cs"
 "Assets/Scripts/FirstPersonController.cs"
 "Assets/Scripts/HoneyCollector.cs"
-"Assets/Scripts/HoneySucker.cs"
 "Assets/Scripts/HoneySuckerController.cs"
 "Assets/Scripts/InteractableObject.cs"
 "Assets/Scripts/PlayerInteraction.cs"

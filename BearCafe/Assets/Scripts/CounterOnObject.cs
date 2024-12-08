@@ -1,33 +1,33 @@
 using System;
 using UnityEngine;  
-using TMPro; // Необходимо для работы с TextMeshPro
+using TMPro;
 
 public class CounterOnObject : MonoBehaviour
 {
-    public TextMeshPro textMeshPro; // Ссылка на компонент TextMeshPro
+    public TextMeshPro textMeshPro;
     public HoneySuckerController Counter;
-    private int score = 0; // Начальное значение счётчика
+    private int score = 0;
 
     void Start()
     {
         Counter = HoneySuckerController.FindObjectOfType<HoneySuckerController>();
-        UpdateScoreText(); // Обновляем текст в начале игры
+        UpdateScoreText();
     }
 
-    void OnMouseDown() // Метод вызывается при нажатии на объект
+    void OnMouseDown()
     {
-        IncreaseScore(); // Увеличиваем счётчик
+        IncreaseScore();
     }
 
     void IncreaseScore()
     {
-        score += Counter.HoneyCount; // Увеличиваем счётчик на 1
-        UpdateScoreText(); // Обновляем текст на объекте
+        score += Counter.HoneyCount;
+        UpdateScoreText();
     }
     
     void UpdateScoreText()
     {
-        textMeshPro.text = "Мёда: " + score; // Обновляем текстовый элемент
+        textMeshPro.text = "Мёд: " + score;
         Counter.HoneyCount = 0;
     }
 }
