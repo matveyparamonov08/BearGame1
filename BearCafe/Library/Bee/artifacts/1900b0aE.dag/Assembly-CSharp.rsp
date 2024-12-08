@@ -364,6 +364,8 @@
 "Assets/Scripts/HoneyCollector.cs"
 "Assets/Scripts/HoneySuckerController.cs"
 "Assets/Scripts/InteractableObject.cs"
+"Assets/Scripts/MainMenuController.cs"
+"Assets/Scripts/PauseMenuController.cs"
 "Assets/Scripts/PlayerInteraction.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
